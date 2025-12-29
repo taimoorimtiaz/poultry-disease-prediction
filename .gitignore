@@ -29,7 +29,8 @@ wheels/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-/media/
+/media/uploads/
+/media/reports/
 /staticfiles/
 /static/
 
@@ -37,6 +38,8 @@ db.sqlite3-journal
 .env
 .env.local
 .env.*.local
+backend/.env
+frontend/.env
 
 # IDE
 .vscode/
@@ -58,19 +61,26 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.pnpm-debug.log
+lerna-debug.log*
 
 # React/Vite
 dist/
 dist-ssr/
 *.local
+.vite/
 
-# Model files (exclude large binary files)
+# Model files (large binary files - keep .gitkeep or README)
 *.pth
 *.pt
 *.h5
 *.onnx
 *.pb
 saved_model/
+
+# But keep the model directory structure
+!model/.gitkeep
+!model/README.md
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -89,3 +99,9 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+~$*

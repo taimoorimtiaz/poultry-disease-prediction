@@ -5,5 +5,6 @@ from .models import InventoryItem
 
 @admin.register(InventoryItem)
 class InventoryAdmin(admin.ModelAdmin):
-    list_display = ("item_name", "user", "quantity", "expiry_date")
-    search_fields = ("item_name", "user__email")
+    list_display = ("name", "user", "category", "quantity", "unit", "expiry_date")
+    list_filter = ("category", "unit")
+    search_fields = ("name", "user__email", "notes")

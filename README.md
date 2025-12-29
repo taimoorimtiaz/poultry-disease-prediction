@@ -1,31 +1,48 @@
 # Poultry Disease Prediction System
 
-A comprehensive full-stack web application for automated poultry disease prediction using deep learning. The system enables farmers, veterinarians, and researchers to upload poultry images, receive AI-powered disease predictions, access treatment recommendations, and locate nearby veterinary clinics.
+A comprehensive full-stack web application for automated poultry disease prediction using deep learning (EfficientNet-B0). The system enables farmers, veterinarians, and administrators to upload poultry images, receive AI-powered disease predictions with 98.29% accuracy, access treatment recommendations, manage inventory, and locate nearby veterinary clinics.
 
 ## 🚀 Features
 
 ### Core Functionality
 - **AI-Powered Disease Detection**: Upload poultry images and get instant disease predictions with confidence scores
+  - Detects 4 disease classes: Coccidiosis, Healthy, Newcastle Disease, Salmonella
+  - 98.29% accuracy using EfficientNet-B0
+  - Age-aware and flock-size-aware medicine recommendations
 - **Image Cropping**: Client-side image cropping before upload for optimal analysis
 - **Real-time Analysis**: Animated analysis feedback with status tracking
 - **Prediction History**: Browse past analyses with thumbnails and confidence indicators
 - **Report Generation**: Download PDF reports of analysis results
 
+### User Management & Authentication
+- **OTP-based Email Verification**: Secure 10-minute OTP verification for signup
+- **JWT Authentication**: Token-based authentication with automatic refresh
+- **Role-based Access Control**: User roles (Farmer, Vet, Admin)
+- **Profile Management**: Update name, phone, notification preferences, theme, and language
+
+### Admin Dashboard (6 Tabs)
+- **Users Admin**: Manage user roles, activation status, view all registered users
+- **Vets & Clinics Admin**: CRUD for veterinary clinics with GPS coordinates
+- **Diseases Admin**: Manage disease database with symptoms and treatment notes
+- **Medicines Admin**: Dosage, pricing, and side effects management
+- **Inventory Admin**: Category-based inventory tracking (Feed, Vaccine, Medicine, Equipment, Supplies)
+- **System Admin**: 
+  - Maintenance mode toggle (blocks non-admin access site-wide)
+  - Signup toggle (allow/disallow new registrations)
+  - Email configuration status
+
 ### Knowledge & Resources
 - **Disease Knowledge Base**: Searchable database of poultry diseases with detailed information
 - **Medicine Recommendations**: Get dosage and administration guidance for predicted diseases
-- **Veterinary Locator**: Find nearby vet clinics using Google Maps integration with distance calculation
-
-### Management & Administration
-- **User Management**: Role-based access control (User, Admin, Veterinarian)
-- **Inventory Tracking**: Manage medicine inventory with expiry date tracking and CSV export
-- **Admin Dashboard**: Comprehensive CRUD interfaces for diseases, medicines, vet clinics, and users
+- **Veterinary Locator**: Find nearby vet clinics using Google Maps integration with OpenStreetMap fallback
 
 ### Security & Performance
 - **JWT Authentication**: Secure token-based authentication with automatic refresh
-- **Rate Limiting**: API throttling to prevent abuse (10 analysis/hour per user)
-- **Input Validation**: Server-side validation for file size (<8MB), type (JPEG/PNG), and data integrity
-- **Responsive UI**: Mobile-friendly design with Tailwind CSS
+- **OTP Email Verification**: 10-minute expiry, HTML emails with branding
+- **Maintenance Mode**: Site-wide enforcement with middleware; admins bypass automatically
+- **Input Validation**: Server-side validation for file size, type, and data integrity
+- **CORS Protection**: Configured for localhost development
+- **Password Hashing**: PBKDF2 with Django's built-in security
 
 ## 📁 Project Structure
 
@@ -37,7 +54,11 @@ poultry-disease-prediction-full-stack-/
 │   │   ├── urls.py              # Root URL configuration
 │   │   └── wsgi.py              # WSGI application
 │   ├── apps/                    # Django applications
-│   │   ├── users/               # User authentication & management
+│   │   ├── users/               # User authentication, OTP, SiteSetting model
+│   │   │   ├── models.py        # User, OTP, SiteSetting (maintenance/signup toggles)
+│   │   │   ├── views.py         # Signup, Login, OTP send/verify, UserViewSet, SiteSettingView
+│   │   │   ├── middleware.py    # MaintenanceModeMiddleware with JWT auth
+│   │   │   └── templates/       # maintenance.html
 │   │   ├── analysis/            # Image upload & disease prediction
 │   │   ├── diseases/            # Disease information management
 │   │   ├── medicines/           # Medicine database & recommendations
@@ -45,103 +66,125 @@ poultry-disease-prediction-full-stack-/
 │   │   ├── inventory/           # Medicine inventory tracking
 │   │   └── reports/             # PDF report generation
 │   ├── media/                   # Uploaded images & generated files
-│   ├── model_loader.py          # AI model integration layer
+│   ├── model_loader.py          # EfficientNet-B0 loader with PyTorch + timm
 │   ├── manage.py                # Django management commands
-│   └── requirements.txt         # Python dependencies
+│   ├── requirements.txt         # Python dependencies
+│   └── venv/                    # Python virtual environment (not in git)
 ├── frontend/                    # React + Vite frontend
 │   ├── src/
 │   │   ├── components/          # Reusable UI components
-│   │   ├── pages/               # Page components (Dashboard, Upload, etc.)
+│   │   │   ├── Header.jsx       # Sticky navbar with hamburger menu
+│   │   │   ├── PrivateRoute.jsx # Auth + maintenance guard
+│   │   │   └── admin/           # 6 admin tabs (Users, Vets, Diseases, Medicines, Inventory, System)
+│   │   ├── pages/               # Page components (Dashboard, Upload, Settings, Admin, Maintenance)
 │   │   ├── services/            # API client & service modules
-│   │   ├── context/             # React context (AuthContext)
-│   │   └── App.jsx              # Root component with routing
+│   │   │   └── api.js           # Axios interceptors for JWT, 503 handling, admin detection
+│   │   ├── context/             # React context (AuthContext with currentUser persistence)
+│   │   └── App.jsx              # Root component with routing + global maintenance guard
 │   ├── public/                  # Static assets
 │   ├── package.json             # Node.js dependencies
-│   └── vite.config.js           # Vite configuration
+│   ├── vite.config.js           # Vite configuration
+│   └── node_modules/            # Node dependencies (not in git)
 └── model/                       # Machine learning model directory
+    ├── efficientnet_b0_best.pth # Trained model (98.29% accuracy)
+    ├── metadata.json            # Class mappings
+    ├── history.json             # Training history
     └── README.md                # Model integration guide
 ```
 
 ## 🛠️ Tech Stack
 
 ### Backend
-- **Framework**: Django 4.x + Django REST Framework
+- **Framework**: Django 4.2.27 + Django REST Framework
 - **Authentication**: Simple JWT (djangorestframework-simplejwt)
-- **Database**: PostgreSQL (psycopg2-binary)
+- **Database**: SQLite (development), PostgreSQL-ready
+- **ML/AI**: PyTorch 2.9.1+cpu, timm (EfficientNet-B0)
 - **Image Processing**: Pillow
 - **PDF Generation**: ReportLab
+- **Email**: Gmail SMTP with TLS encryption (port 587)
 - **API Documentation**: drf-spectacular (OpenAPI/Swagger)
-- **Task Queue** (optional): Celery + Redis
 
 ### Frontend
 - **Framework**: React 18.2
-- **Build Tool**: Vite 5.0
+- **Build Tool**: Vite 5.4
 - **Styling**: Tailwind CSS 3.4
 - **Routing**: React Router DOM 6.21
 - **HTTP Client**: Axios 1.6.2
-- **Forms**: Formik 2.4.5 + Yup 1.3.3
 - **Animations**: Framer Motion 10.16
 - **Image Processing**: react-easy-crop 5.0.4, react-dropzone 14.2.3
-- **Maps**: @react-google-maps/api 2.19.2
-- **Charts**: Recharts 2.10.3
+- **Maps**: Google Maps JavaScript API + Leaflet 1.9.4 with OpenStreetMap fallback
+- **Icons**: react-icons
 
 ## 📋 Prerequisites
 
-- **Python**: 3.9 or higher
+- **Python**: 3.9 or higher (with PyTorch 2.9.1+cpu and timm)
 - **Node.js**: 16.x or higher
-- **PostgreSQL**: 13 or higher
 - **Git**: For version control
+- **Gmail Account**: For OTP email functionality (or any SMTP server)
 
 ## 🚀 Getting Started
 
 ### Backend Setup
 
-1. **Navigate to backend directory**:
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/AbdulHaseeb598/poultry-disease-prediction-full-stack-.git
+   cd poultry-disease-prediction-full-stack-
+   ```
+
+2. **Navigate to backend directory**:
    ```bash
    cd backend
    ```
 
-2. **Create virtual environment**:
+3. **Create virtual environment**:
    ```bash
    python -m venv venv
    ```
 
-3. **Activate virtual environment**:
-   - Windows: `venv\Scripts\activate`
-   - macOS/Linux: `source venv/bin/activate`
+4. **Activate virtual environment**:
+   - **Windows PowerShell**: `.\venv\Scripts\Activate.ps1`
+   - **Windows CMD**: `venv\Scripts\activate.bat`
+   - **macOS/Linux**: `source venv/bin/activate`
 
-4. **Install dependencies**:
+5. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
+   
+   **Important**: Make sure PyTorch and timm are installed:
+   ```bash
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+   pip install timm
+   ```
 
-5. **Create `.env` file** in `backend/` directory:
+6. **Create `.env` file** in `backend/` directory:
    ```env
    # Django
-   DJANGO_SECRET_KEY=your-secret-key-here-generate-with-django
-   DJANGO_DEBUG=True
-   DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+   SECRET_KEY=your-secret-key-here-generate-with-django-get-secret-key
+   DEBUG=True
+   ALLOWED_HOSTS=localhost,127.0.0.1
 
-   # Database
-   DATABASE_URL=postgresql://user:password@localhost:5432/poultry_db
+   # Database (SQLite by default, no configuration needed)
+   # For PostgreSQL, uncomment and configure:
+   # DATABASE_URL=postgresql://user:password@localhost:5432/poultry_db
 
-   # Model
-   MODEL_DIR=u:/Abdul_Haseeb(BAI)/FYP/saim/poultry-disease-prediction-full-stack-/model
+   # Email Configuration (REQUIRED for OTP functionality)
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USE_TLS=True
+   EMAIL_HOST_USER=your-email@gmail.com
+   EMAIL_HOST_PASSWORD=your-gmail-app-password
+   DEFAULT_FROM_EMAIL=PoultryAI <your-email@gmail.com>
 
    # Google Maps (optional, for vet locator)
    GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-
-   # JWT (optional, defaults provided in settings.py)
-   JWT_ACCESS_TOKEN_LIFETIME_MINUTES=15
-   JWT_REFRESH_TOKEN_LIFETIME_DAYS=7
    ```
 
-6. **Create PostgreSQL database**:
-   ```bash
-   psql -U postgres
-   CREATE DATABASE poultry_db;
-   \q
-   ```
+   **📧 Email Setup for OTP Verification:**
+   - For Gmail: Generate an App Password at https://myaccount.google.com/apppasswords
+   - Enable 2-Factor Authentication first
+   - Use the generated 16-character password in `EMAIL_HOST_PASSWORD`
 
 7. **Run migrations**:
    ```bash
@@ -149,21 +192,24 @@ poultry-disease-prediction-full-stack-/
    python manage.py migrate
    ```
 
-8. **Create superuser**:
+8. **Create superuser (admin account)**:
    ```bash
    python manage.py createsuperuser
    ```
+   Follow prompts to set email and password.
 
-9. **Start development server**:
+9. **Start development server (with venv activated)**:
    ```bash
    python manage.py runserver
    ```
 
-   Backend will run at `http://localhost:8000`
+   Backend will run at `http://127.0.0.1:8000/`
+   
+   **✅ You should see**: "Model loaded: 0 missing keys, 0 unexpected keys"
 
 ### Frontend Setup
 
-1. **Navigate to frontend directory**:
+1. **Navigate to frontend directory** (from project root):
    ```bash
    cd frontend
    ```
@@ -175,7 +221,7 @@ poultry-disease-prediction-full-stack-/
 
 3. **Create `.env` file** in `frontend/` directory:
    ```env
-   VITE_API_BASE=http://localhost:8000
+   VITE_API_BASE=http://localhost:8000/api
    VITE_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
    ```
 
@@ -183,6 +229,168 @@ poultry-disease-prediction-full-stack-/
    ```bash
    npm run dev
    ```
+
+   Frontend will run at `http://localhost:5173/`
+
+## 🎯 Usage
+
+1. **Access the application**: Open `http://localhost:5173/` in your browser
+
+2. **Sign Up**: 
+   - Click "Sign Up"
+   - Enter email, name, password
+   - Request OTP via email
+   - Enter the 6-digit OTP (expires in 10 minutes)
+   - Account created and logged in automatically
+
+3. **Login as Admin**:
+   - Use superuser credentials created earlier
+   - Access Admin Dashboard at `/admin`
+   - Manage users, vets, diseases, medicines, inventory, and system settings
+
+4. **Upload Images**:
+   - Navigate to "Upload" page
+   - Drag & drop or select poultry image
+   - Crop if needed
+   - Get AI prediction with confidence scores
+   - View medicine recommendations
+
+5. **Admin Features**:
+   - **Maintenance Mode**: Toggle to block non-admin access (System tab)
+   - **Signup Toggle**: Allow/disallow new registrations (System tab)
+   - **User Management**: Change roles, activate/deactivate users (Users tab)
+   - **Content Management**: Add/edit diseases, medicines, vet clinics, inventory
+
+## 🔐 Default Credentials
+
+After running `createsuperuser`, use those credentials to login as admin.
+
+**Note**: All new users must verify their email with OTP before accessing the system.
+
+## 📝 API Documentation
+
+Once the backend is running, visit:
+- **Swagger UI**: `http://localhost:8000/api/schema/swagger-ui/`
+- **ReDoc**: `http://localhost:8000/api/schema/redoc/`
+
+## 🛡️ Security Features
+
+- **JWT Authentication**: Access tokens (15 min) + Refresh tokens (7 days)
+- **OTP Email Verification**: 6-digit codes with 10-minute expiry
+- **Maintenance Mode**: Middleware enforces site-wide blocks for non-admin users
+- **Password Hashing**: PBKDF2 with Django's built-in security
+- **CORS Protection**: Configured whitelist
+- **Role-based Access**: IsAdmin permission class for protected endpoints
+
+## 🌐 Environment Variables Reference
+
+### Backend `.env`
+```env
+SECRET_KEY=<django-secret-key>
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=<your-email@gmail.com>
+EMAIL_HOST_PASSWORD=<gmail-app-password>
+DEFAULT_FROM_EMAIL=PoultryAI <your-email@gmail.com>
+GOOGLE_MAPS_API_KEY=<optional>
+```
+
+### Frontend `.env`
+```env
+VITE_API_BASE=http://localhost:8000/api
+VITE_GOOGLE_MAPS_API_KEY=<optional>
+```
+
+## 🚨 Troubleshooting
+
+### Backend Issues
+
+**1. Model not loading / Mock predictions (25% confidence)**
+```bash
+# Ensure venv is activated before starting Django
+cd backend
+.\venv\Scripts\Activate.ps1  # Windows PowerShell
+python manage.py runserver
+# Check for: "Model loaded: 0 missing keys, 0 unexpected keys"
+```
+
+**2. Multiple Django servers running**
+```bash
+# Windows: Find and kill processes on port 8000
+netstat -ano | findstr :8000
+taskkill /F /PID <process-id>
+```
+
+**3. Email not sending**
+- Verify Gmail App Password (not your regular password)
+- Enable 2FA on Google account first
+- Check `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD` in `.env`
+
+**4. Database errors**
+```bash
+# Reset database
+python manage.py flush
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+### Frontend Issues
+
+**1. White screen / Component errors**
+- Check browser console for errors
+- Ensure backend is running and accessible
+- Verify `VITE_API_BASE` in frontend `.env`
+
+**2. Maintenance page for admins**
+- Log out and log back in to refresh JWT token and persist `currentUser`
+- Ensure user has `role='admin'` in database
+
+**3. Hamburger menu not closing**
+- Already fixed with click-outside detection and overlay
+- Refresh the page if persists
+
+## 📦 Deployment
+
+### Backend (Django)
+1. Set `DEBUG=False` in `.env`
+2. Update `ALLOWED_HOSTS` with your domain
+3. Configure PostgreSQL database
+4. Collect static files: `python manage.py collectstatic`
+5. Use gunicorn or uWSGI for production server
+6. Set up Nginx as reverse proxy
+
+### Frontend (React)
+1. Update `VITE_API_BASE` to production API URL
+2. Build: `npm run build`
+3. Deploy `dist/` folder to hosting service (Vercel, Netlify, etc.)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/YourFeature`
+3. Commit changes: `git commit -m 'Add YourFeature'`
+4. Push to branch: `git push origin feature/YourFeature`
+5. Open Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Abdul Haseeb**
+- GitHub: [@AbdulHaseeb598](https://github.com/AbdulHaseeb598)
+- Email: haseebkhansherani787@gmail.com
+
+## 🙏 Acknowledgments
+
+- EfficientNet-B0 model from timm library
+- Django REST Framework community
+- React and Vite communities
+- OpenStreetMap for fallback mapping
 
    Frontend will run at `http://localhost:5173`
 

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useSearchParams } from 'react-router-dom'
 import DiseasesManager from './DiseasesManager'
 import MedicinesManager from './MedicinesManager'
 import VetsManager from './VetsManager'
@@ -15,7 +16,15 @@ const tabs = [
 ]
 
 export default function AdminDashboard() {
+  const [searchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState('diseases')
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab')
+    if (tabParam && tabs.some(tab => tab.id === tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [searchParams])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

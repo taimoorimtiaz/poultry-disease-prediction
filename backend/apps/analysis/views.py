@@ -41,12 +41,31 @@ class AnalysisUploadView(APIView):
 
     def post(self, request, *args, **kwargs):
         uploaded = request.FILES.get("file")
+        age_weeks_raw = request.data.get("age_weeks")
+        flock_size_raw = request.data.get("flock_size")
         if not uploaded:
             return Response({"detail": "file is required"}, status=status.HTTP_400_BAD_REQUEST)
         if uploaded.size > MAX_UPLOAD_SIZE:
             return Response({"detail": "File too large. Max 8MB."}, status=status.HTTP_400_BAD_REQUEST)
         if uploaded.content_type not in ALLOWED_IMAGE_TYPES:
             return Response({"detail": "Invalid file type. Only JPEG/PNG allowed."}, status=status.HTTP_400_BAD_REQUEST)
+
+        age_weeks = None
+        flock_size = None
+        if age_weeks_raw:
+            try:
+                age_weeks = int(age_weeks_raw)
+                if age_weeks <= 0:
+                    raise ValueError
+            except ValueError:
+                return Response({"detail": "age_weeks must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
+        if flock_size_raw:
+            try:
+                flock_size = int(flock_size_raw)
+                if flock_size <= 0:
+                    raise ValueError
+            except ValueError:
+                return Response({"detail": "flock_size must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
             sample = SampleImage.objects.create(user=request.user, image=uploaded)
@@ -57,7 +76,9 @@ class AnalysisUploadView(APIView):
                 logger.warning("Thumbnail generation failed: %s", exc)
             # TODO: enqueue background job instead for heavy models
             sample.image.open("rb")
-            prediction = model_loader.model_loader.predict(sample.image.read())
+            prediction = model_loader.model_loader.predict(
+                sample.image.read(), age_weeks=age_weeks, flock_size=flock_size
+            )
             sample.image.close()
             diseases_payload = []
             for idx, pred in enumerate(prediction.get("predictions", [])):
@@ -85,6 +106,8 @@ class AnalysisUploadView(APIView):
                 sample=sample,
                 predicted_diseases=diseases_payload,
                 medicines_recommended=meds_payload,
+                age_weeks=age_weeks,
+                flock_size=flock_size,
             )
 
         serializer = AnalysisResultSerializer(result)

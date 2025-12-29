@@ -84,7 +84,7 @@ export default function Result() {
           </div>
 
           {/* Sample Image */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Sample Image</h3>
             {result?.sample?.image && (
               <img
@@ -109,19 +109,19 @@ export default function Result() {
           <button
             onClick={handleDownloadReport}
             disabled={generatingReport}
-            className="px-6 py-3 bg-secondary text-white rounded-lg hover:bg-blue-600 transition font-medium disabled:opacity-50"
+            className="px-6 py-3 text-white rounded-xl glow-button font-medium disabled:opacity-50"
           >
             {generatingReport ? 'Generating...' : '📄 Download PDF Report'}
           </button>
           <button
             onClick={() => setShowMap(true)}
-            className="px-6 py-3 bg-danger text-white rounded-lg hover:bg-red-600 transition font-medium"
+            className="px-6 py-3 bg-danger text-white rounded-xl shadow-lg hover:bg-red-600 transition font-medium"
           >
             🏥 Find Nearest Vets
           </button>
           <button
             onClick={() => navigate('/upload')}
-            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-green-700 transition font-medium"
+            className="px-6 py-3 bg-primary text-white rounded-xl shadow-lg hover:bg-green-700 transition font-medium"
           >
             📤 New Analysis
           </button>
@@ -133,7 +133,7 @@ export default function Result() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="mt-8 bg-white rounded-lg shadow-lg p-6"
+            className="mt-8 glass-panel rounded-2xl p-6"
           >
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Detailed Medicine Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

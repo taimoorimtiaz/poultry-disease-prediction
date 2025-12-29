@@ -8,9 +8,22 @@ export default function ResultCard({ result }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white rounded-lg shadow-lg p-6"
+      className="glass-panel rounded-2xl p-6"
     >
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Analysis Results</h2>
+
+      {(result.age_weeks || result.flock_size) && (
+        <div className="flex flex-wrap gap-4 mb-6">
+          {result.age_weeks && (
+            <span className="pill">
+              Age: {result.age_weeks} week{result.age_weeks === 1 ? '' : 's'}
+            </span>
+          )}
+          {result.flock_size && (
+            <span className="pill">Flock size: {result.flock_size} birds</span>
+          )}
+        </div>
+      )}
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-700 mb-3">Predicted Diseases</h3>
@@ -26,7 +39,7 @@ export default function ResultCard({ result }) {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                   <div
-                    className="bg-primary h-2 rounded-full transition-all duration-500"
+                    className="h-2 rounded-full transition-all duration-500 bg-gradient-to-r from-primary to-secondary"
                     style={{ width: `${pred.confidence * 100}%` }}
                   />
                 </div>
@@ -43,7 +56,7 @@ export default function ResultCard({ result }) {
         {result.medicines_recommended && result.medicines_recommended.length > 0 ? (
           <div className="space-y-4">
             {result.medicines_recommended.map((med, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-lg p-4">
+              <div key={idx} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                 <h4 className="font-semibold text-gray-800 mb-2">{med.name}</h4>
                 <div className="text-sm text-gray-600 space-y-1">
                   <p>

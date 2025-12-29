@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { useAuth } from '../../context/AuthContext'
+import { authService } from '../../services/api'
 import { motion } from 'framer-motion'
 
 const validationSchema = Yup.object({
@@ -18,6 +19,10 @@ export default function Signup() {
   const navigate = useNavigate()
   const { signup } = useAuth()
   const [error, setError] = useState('')
+  const [showOTPModal, setShowOTPModal] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [pendingSignupData, setPendingSignupData] = useState(null)
+  const [otpLoading, setOtpLoading] = useState(false)
 
   const formik = useFormik({
     initialValues: {
@@ -30,15 +35,52 @@ export default function Signup() {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         setError('')
-        await signup({ name: values.name, email: values.email, password: values.password })
-        navigate('/dashboard')
+        
+        // Always send OTP for signup
+        await authService.sendOTP({ 
+          email: values.email, 
+          purpose: 'signup' 
+        })
+        
+        // Store signup data temporarily
+        setPendingSignupData({
+          name: values.name,
+          email: values.email,
+          password: values.password
+        })
+        
+        setShowOTPModal(true)
       } catch (err) {
-        setError(err.response?.data?.email?.[0] || err.response?.data?.detail || 'Signup failed. Please try again.')
+        setError(err.response?.data?.message || err.response?.data?.email?.[0] || err.response?.data?.detail || 'Signup failed. Please try again.')
       } finally {
         setSubmitting(false)
       }
     },
   })
+
+  const handleVerifyOTPAndSignup = async () => {
+    if (!otp || otp.length !== 6) {
+      setError('Please enter a valid 6-digit OTP')
+      return
+    }
+
+    setOtpLoading(true)
+    setError('')
+
+    try {
+      // Backend will validate OTP during signup
+      await signup({
+        ...pendingSignupData,
+        otp: otp
+      })
+      
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid OTP or signup failed')
+    } finally {
+      setOtpLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-50 to-blue-50">
@@ -143,6 +185,7 @@ export default function Signup() {
                 <p className="mt-1 text-sm text-danger">{formik.errors.confirmPassword}</p>
               )}
             </div>
+
           </div>
 
           <button
@@ -150,10 +193,58 @@ export default function Signup() {
             disabled={formik.isSubmitting}
             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            {formik.isSubmitting ? 'Creating account...' : 'Sign up'}
+            {formik.isSubmitting ? 'Sending OTP...' : 'Send OTP to Sign Up'}
           </button>
         </form>
       </motion.div>
+
+      {/* OTP Verification Modal */}
+      {showOTPModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 max-w-md w-full"
+          >
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Verify Your Email</h3>
+            <p className="text-gray-600 mb-4">
+              We've sent a verification code to <strong>{pendingSignupData?.email}</strong>
+            </p>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-danger px-4 py-3 rounded-lg mb-4 text-sm">
+                {error}
+              </div>
+            )}
+            <input
+              type="text"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="Enter 6-digit OTP"
+              maxLength={6}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4 text-center text-2xl tracking-widest"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowOTPModal(false)
+                  setOtp('')
+                  setError('')
+                }}
+                className="flex-1 px-4 py-3 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleVerifyOTPAndSignup}
+                disabled={otpLoading || otp.length !== 6}
+                className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+              >
+                {otpLoading ? 'Verifying...' : 'Verify & Sign Up'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   )
 }

@@ -27,6 +27,40 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
+    
+    // Check for maintenance mode (503) - but only redirect non-admin users
+    if (error.response?.status === 503) {
+      // Check if user is admin
+      const token = localStorage.getItem('accessToken')
+      let isAdmin = false
+      
+      if (token) {
+        try {
+          const decoded = jwtDecode(token)
+          isAdmin = decoded.role === 'admin'
+        } catch (e) {
+          // Invalid token, not admin
+        }
+      }
+      // Fallback to persisted user if token lacks claims (e.g., after refresh)
+      if (!isAdmin) {
+        try {
+          const persisted = JSON.parse(localStorage.getItem('currentUser') || 'null')
+          if (persisted?.role === 'admin') {
+            isAdmin = true
+          }
+        } catch {}
+      }
+      // Never redirect while on admin routes
+      const onAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+      
+      // Only redirect non-admin users to maintenance page
+      if (!isAdmin && !onAdminRoute) {
+        window.location.href = '/maintenance'
+      }
+      return Promise.reject(error)
+    }
+    
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       const refreshToken = localStorage.getItem('refreshToken')
@@ -54,6 +88,11 @@ export const authService = {
   signup: (data) => api.post('/auth/signup/', data),
   login: (data) => api.post('/auth/login/', data),
   me: () => api.get('/auth/me/'),
+  updateProfile: (data) => api.patch('/auth/me/', data),
+  changePassword: (data) => api.post('/auth/change-password/', data),
+  deleteAccount: (data) => api.post('/auth/delete-account/', data),
+  sendOTP: (data) => api.post('/auth/send-otp/', data),
+  verifyOTP: (data) => api.post('/auth/verify-otp/', data),
   logout: () => {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
@@ -130,8 +169,13 @@ export const reportService = {
 
 export const userService = {
   list: (params) => api.get('/auth/users/', { params }),
-  update: (id, data) => api.put(`/auth/users/${id}/`, data),
+  update: (id, data) => api.patch(`/auth/users/${id}/`, data),
   delete: (id) => api.delete(`/auth/users/${id}/`),
+}
+
+export const settingsService = {
+  get: () => api.get('/auth/settings/'),
+  update: (data) => api.patch('/auth/settings/', data),
 }
 
 export default api

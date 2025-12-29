@@ -1,0 +1,10 @@
+{
+  "model_file": "efficientnet_b0_best.pth",
+  "classes": [
+    "Coccidiosis",
+    "Healthy",
+    "New Castle Disease",
+    "Salmonella"
+  ],
+  "input_size": 224
+}

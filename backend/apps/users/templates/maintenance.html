@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Mode - PoultryAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .features h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features li {
+            padding: 8px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features li:before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .contact {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .contact p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 40px 25px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .icon {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <span>🐔</span>
+            <span>PoultryAI</span>
+        </div>
+
+        <div class="icon">🔧</div>
+        
+        <h1>Under Maintenance</h1>
+        <p class="subtitle">We're making things better!</p>
+        
+        <p>
+            Our system is currently undergoing scheduled maintenance to improve your experience. 
+            We're working hard to bring you enhanced features and better performance.
+        </p>
+
+        <div class="features">
+            <h3>🚀 What We're Working On</h3>
+            <ul>
+                <li>System upgrades and optimizations</li>
+                <li>Enhanced AI disease detection</li>
+                <li>Performance improvements</li>
+                <li>New features and capabilities</li>
+            </ul>
+        </div>
+
+        <p>
+            We apologize for any inconvenience. We'll be back online shortly!
+        </p>
+
+        <div class="status-badge">
+            ⚠️ Maintenance in Progress
+        </div>
+
+        <div class="contact">
+            <p>
+                Need urgent assistance? Contact our support team.<br>
+                Thank you for your patience!
+            </p>
+        </div>
+    </div>
+</body>
+</html>

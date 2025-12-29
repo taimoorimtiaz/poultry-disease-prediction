@@ -5,6 +5,7 @@ import math
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from apps.users.permissions import IsAdminOrReadOnly
 
@@ -27,7 +28,7 @@ class VetClinicViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     search_fields = ["name", "address", "phone"]
 
-    @action(detail=False, methods=["get"], url_path="nearby")
+    @action(detail=False, methods=["get"], url_path="nearby", permission_classes=[AllowAny])
     def nearby(self, request):
         try:
             lat = float(request.query_params.get("lat"))

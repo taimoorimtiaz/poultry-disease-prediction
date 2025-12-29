@@ -17,5 +17,13 @@ class AnalysisResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnalysisResult
-        fields = ["id", "sample", "predicted_diseases", "medicines_recommended", "processed_at"]
+        fields = [
+            "id",
+            "sample",
+            "predicted_diseases",
+            "medicines_recommended",
+            "age_weeks",
+            "flock_size",
+            "processed_at",
+        ]
         read_only_fields = ["id", "processed_at"]

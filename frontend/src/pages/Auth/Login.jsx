@@ -25,7 +25,7 @@ export default function Login() {
       try {
         setError('')
         await login(values)
-        navigate('/')
+        navigate('/dashboard')
       } catch (err) {
         console.error('Login error:', err)
         setError(err.response?.data?.detail || err.message || 'Login failed. Please check your credentials.')

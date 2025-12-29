@@ -13,6 +13,8 @@ export default function UploadCropAnalyze() {
   const [showCropper, setShowCropper] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState('')
+  const [ageWeeks, setAgeWeeks] = useState('')
+  const [flockSize, setFlockSize] = useState('')
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0]
@@ -54,6 +56,8 @@ export default function UploadCropAnalyze() {
     try {
       const formData = new FormData()
       formData.append('file', croppedBlob, 'sample.jpg')
+      if (ageWeeks) formData.append('age_weeks', ageWeeks)
+      if (flockSize) formData.append('flock_size', flockSize)
 
       // Show animation for at least 1 second
       const [response] = await Promise.all([
@@ -83,7 +87,10 @@ export default function UploadCropAnalyze() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Analyze Chicken Feces Sample</h1>
+        <p className="pill mb-2 inline-flex">Smart analyzer • Ready</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Analyze chicken sample <span className="accent-gradient">instantly</span>
+        </h1>
         <p className="text-gray-600 mb-8">Upload an image to detect potential diseases</p>
 
         {error && (
@@ -93,16 +100,14 @@ export default function UploadCropAnalyze() {
         )}
 
         {analyzing ? (
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="glass-panel rounded-2xl p-8">
             <AnimateAnalyzing />
           </div>
         ) : !croppedBlob ? (
           <div
             {...getRootProps()}
-            className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition ${
-              isDragActive
-                ? 'border-primary bg-green-50'
-                : 'border-gray-300 hover:border-primary hover:bg-gray-50'
+            className={`glass-panel neon-border rounded-2xl p-12 text-center cursor-pointer transition border-2 border-dashed ${
+              isDragActive ? 'border-primary bg-white/60' : 'border-gray-200 hover:border-primary'
             }`}
           >
             <input {...getInputProps()} />
@@ -114,25 +119,55 @@ export default function UploadCropAnalyze() {
             <p className="text-xs text-gray-400">Supported formats: JPEG, PNG (max 8MB)</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="glass-panel rounded-2xl p-6">
             <h2 className="text-xl font-semibold mb-4">Cropped Image Preview</h2>
             <div className="mb-6 flex justify-center">
               <img
                 src={URL.createObjectURL(croppedBlob)}
                 alt="Cropped preview"
-                className="max-w-md rounded-lg shadow"
+                className="max-w-md rounded-xl shadow-xl"
               />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="ageWeeks">
+                  Chicken age (weeks)
+                </label>
+                <input
+                  id="ageWeeks"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 6"
+                  value={ageWeeks}
+                  onChange={(e) => setAgeWeeks(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="flockSize">
+                  Flock size (number of birds)
+                </label>
+                <input
+                  id="flockSize"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 50"
+                  value={flockSize}
+                  onChange={(e) => setFlockSize(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
             </div>
             <div className="flex gap-4">
               <button
                 onClick={handleAnalyze}
-                className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-green-700 transition font-medium"
+                className="flex-1 px-6 py-3 text-white rounded-xl glow-button font-medium"
               >
                 🔬 Analyze Sample
               </button>
               <button
                 onClick={handleReset}
-                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition font-medium"
               >
                 Reset
               </button>
@@ -153,7 +188,7 @@ export default function UploadCropAnalyze() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6"
+          className="mt-8 glass-panel rounded-2xl p-6 border border-blue-100/60"
         >
           <h3 className="text-lg font-semibold text-blue-900 mb-3">📋 Instructions</h3>
           <ol className="list-decimal list-inside text-sm text-blue-800 space-y-2">

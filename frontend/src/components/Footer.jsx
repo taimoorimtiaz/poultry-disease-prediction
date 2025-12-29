@@ -1,13 +1,13 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-800 text-white py-6 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p className="text-sm">
-          &copy; {new Date().getFullYear()} Poultry Disease Prediction System. All rights reserved.
-        </p>
-        <p className="text-xs text-gray-400 mt-2">
-          Built with Django REST Framework & React
-        </p>
+    <footer className="mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="glass-panel rounded-2xl px-6 py-5 text-center border border-white/50 shadow-lg">
+          <p className="text-sm font-semibold text-gray-800">
+            &copy; {new Date().getFullYear()} Poultry Disease Prediction System
+          </p>
+          <p className="text-xs text-gray-500 mt-1">Built with Django REST Framework & React</p>
+        </div>
       </div>
     </footer>
   )
