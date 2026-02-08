@@ -1,0 +1,25 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "backend/wsgi.py",
+        "use": "@vercel/python"
+      },
+      {
+        "src": "package.json",
+        "use": "@vercel/static-build",
+        "config": { "distDir": "build" }
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/api/(.*)",
+        "destination": "backend/wsgi.py"
+      },
+      {
+        "source": "/(.*)",
+        "destination": "/index.html"
+      }
+    ]
+  }
+  
