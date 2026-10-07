@@ -40,7 +40,7 @@ function AppContent() {
           navigate('/maintenance', { replace: true })
         }
       } catch {
-        // ignore
+    
       }
     }
     check()

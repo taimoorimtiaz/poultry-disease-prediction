@@ -13,7 +13,6 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import model_loader
 from apps.diseases.models import Disease
 from apps.medicines.models import Medicine
 
@@ -40,6 +39,9 @@ class AnalysisUploadView(APIView):
     throttle_scope = "analysis"
 
     def post(self, request, *args, **kwargs):
+        # Lazy import model_loader only when needed
+        import model_loader
+        
         uploaded = request.FILES.get("file")
         age_weeks_raw = request.data.get("age_weeks")
         flock_size_raw = request.data.get("flock_size")
@@ -80,6 +82,24 @@ class AnalysisUploadView(APIView):
                 sample.image.read(), age_weeks=age_weeks, flock_size=flock_size
             )
             sample.image.close()
+            
+            # Check if the image was rejected as invalid (not a valid poultry/feces image)
+            if prediction.get("status") == "invalid":
+                sample.delete()  # Clean up the uploaded image
+                return Response(
+                    {"detail": prediction.get("detail", "Invalid image. Please upload a clear photo of chicken droppings.")},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Check if the image is unclear or confidence is too low
+            if prediction.get("status") == "unclear":
+                sample.delete()  # Clean up the uploaded image
+                return Response(
+                    {"detail": prediction.get("message", "Unable to analyze. Please upload a clearer image of chicken droppings.")},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Process predicted diseases (includes all top predictions, not just the primary one)
             diseases_payload = []
             for idx, pred in enumerate(prediction.get("predictions", [])):
                 disease_obj = Disease.objects.filter(name__iexact=pred.get("disease")).first()
@@ -90,15 +110,23 @@ class AnalysisUploadView(APIView):
                         "confidence": pred.get("confidence", 0),
                     }
                 )
+            
+            # Process medicines recommended for ALL predicted diseases
             meds_payload = []
+            meds_seen = set()  # Track seen medicines to avoid duplicates
             for rec in prediction.get("recommendations", []):
-                med_obj = Medicine.objects.filter(name__iexact=rec.get("medicine")).first()
+                med_name = rec.get("medicine", "").strip()
+                if not med_name or med_name in meds_seen:
+                    continue
+                
+                meds_seen.add(med_name)
+                med_obj = Medicine.objects.filter(name__iexact=med_name).first()
                 meds_payload.append(
                     {
                         "id": med_obj.id if med_obj else None,
-                        "name": rec.get("medicine"),
-                        "dosage": rec.get("dosage"),
-                        "administration": rec.get("admin"),
+                        "name": med_name,
+                        "dosage": rec.get("dosage", ""),
+                        "administration": rec.get("admin", ""),
                     }
                 )
 

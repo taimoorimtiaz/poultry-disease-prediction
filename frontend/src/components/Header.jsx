@@ -52,16 +52,16 @@ export default function Header() {
   }, [mobileMenuOpen])
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-md">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl shadow-md">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-3">
-        <div className="glass-panel rounded-2xl px-5 py-3 flex items-center justify-between border border-white/40 shadow-xl">
+        <div className="glass-panel rounded-2xl px-5 py-3 flex items-center justify-between border border-indigo-100/40 shadow-xl">
           {/* Left: Hamburger + Brand */}
           <div className="flex items-center gap-3">
             {user && (
               <button
                 ref={buttonRef}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="flex flex-col gap-1.5 p-2 rounded-lg hover:bg-white/50 transition"
+                className="flex flex-col gap-1.5 p-2 rounded-lg hover:bg-indigo-50 transition"
                 aria-label="Toggle menu"
               >
                 <span className={`hamburger-line block w-6 h-0.5 bg-gray-800 transition-transform ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
@@ -75,7 +75,7 @@ export default function Header() {
                 <span className="text-xl">🐔</span>
                 <span className="font-semibold">Poultry AI</span>
               </div>
-              <span className="hidden sm:block text-sm text-gray-500">Health diagnostics made vivid</span>
+              <span className="hidden sm:block text-sm text-gray-500">Smart disease detection</span>
             </Link>
           </div>
 
@@ -83,7 +83,7 @@ export default function Header() {
           {user && (
             <div className="hidden lg:flex items-center gap-4">
               <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
-                <span className="soft-badge">Realtime</span>
+                <span className="soft-badge bg-indigo-100 text-indigo-700">Live</span>
                 <span className="text-xs text-gray-500">Signed in as {user.role}</span>
               </div>
               <div className="flex items-center gap-3">
@@ -104,12 +104,12 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(false)}
             ></div>
             {/* Panel */}
-            <div ref={menuRef} className="fixed top-0 left-0 h-screen w-80 max-w-[85vw] glass-panel border border-white/40 shadow-2xl rounded-r-2xl z-[70] p-4">
+            <div ref={menuRef} className="fixed top-0 left-0 h-screen w-80 max-w-[85vw] glass-panel border border-indigo-100/40 shadow-2xl rounded-r-2xl z-[70] p-4">
               <div className="flex flex-col gap-2">
                 <Link
                   to="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="ghost-button px-4 py-3 rounded-lg bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
+                  className="ghost-button px-4 py-3 rounded-xl bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
                 >
                   <span className="mr-2">🏠</span>
                   Dashboard
@@ -117,7 +117,7 @@ export default function Header() {
                 <Link
                   to="/upload"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="ghost-button px-4 py-3 rounded-lg bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
+                  className="ghost-button px-4 py-3 rounded-xl bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
                 >
                   <span className="mr-2">📤</span>
                   Upload
@@ -125,7 +125,7 @@ export default function Header() {
                 <Link
                   to="/history"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="ghost-button px-4 py-3 rounded-lg bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
+                  className="ghost-button px-4 py-3 rounded-xl bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
                 >
                   <span className="mr-2">📊</span>
                   History
@@ -133,15 +133,23 @@ export default function Header() {
                 <Link
                   to="/inventory"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="ghost-button px-4 py-3 rounded-lg bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
+                  className="ghost-button px-4 py-3 rounded-xl bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
                 >
                   <span className="mr-2">📦</span>
                   Inventory
                 </Link>
                 <Link
+                  to="/knowledge"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="ghost-button px-4 py-3 rounded-xl bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
+                >
+                  <span className="mr-2">📚</span>
+                  Knowledge
+                </Link>
+                <Link
                   to="/settings"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="ghost-button px-4 py-3 rounded-lg bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
+                  className="ghost-button px-4 py-3 rounded-xl bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
                 >
                   <span className="mr-2">⚙️</span>
                   Settings
@@ -150,16 +158,16 @@ export default function Header() {
                   <Link
                     to="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="ghost-button px-4 py-3 rounded-lg bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
+                    className="ghost-button px-4 py-3 rounded-xl bg-white/70 text-left font-medium hover:scale-[1.02] transition-all"
                   >
                     <span className="mr-2">👑</span>
                     Admin
                   </Link>
                 )}
 
-                <div className="border-t border-gray-200/60 my-3"></div>
+                <div className="border-t border-indigo-200/60 my-3"></div>
 
-                <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-blue-50 to-green-50 border border-blue-100/50">
+                <div className="px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100/50">
                   <p className="font-semibold text-gray-800 flex items-center gap-2">
                     <span className="text-lg">👤</span>
                     {user.name}
